@@ -1,0 +1,29 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Variables de entorno y secretos (NUNCA subir la API key)
+.env
+*.key
+
+# Logs y temporales del runner
+*.log
+*.err
+data/processed/_tmp_*.db
+data/processed/_tmp_*.csv
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Activos descargados en runtime
+src/logo_utp.png
