@@ -200,6 +200,52 @@ st.markdown("""
             color: #f1f5f9 !important;
         }
     }
+
+    /* =================================================================
+       Personalización de los multiselect del sidebar
+       ----------------------------------------------------------------
+       1) Ocultar la "x" de "Clear all" (limpiar todo): ahora es
+          redundante con los botones Todas / Ninguna / Limpiar.
+       2) Reemplazar la flecha del dropdown por un botón "+" circular
+          moderno, que comunica mejor la acción de "añadir filtro".
+       Se usa el selector :has() (soportado por Chrome/Edge modernos).
+       ================================================================= */
+
+    /* (1) Quitar el icono de limpiar todo */
+    section[data-testid="stSidebar"] [data-baseweb="select"] svg[title="Clear all"] {
+        display: none !important;
+    }
+
+    /* (2) Ocultar la flecha original y dibujar un "+" en su lugar */
+    section[data-testid="stSidebar"] [data-baseweb="select"] svg[title="open"] {
+        display: none !important;
+    }
+    section[data-testid="stSidebar"] [data-baseweb="select"] div:has(> svg[title="open"]) {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+    section[data-testid="stSidebar"] [data-baseweb="select"] div:has(> svg[title="open"])::after {
+        content: "+";
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #2563EB;
+        color: #FFFFFF;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1;
+        box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35);
+        transition: background 0.15s ease, transform 0.15s ease;
+    }
+    /* Efecto hover: el "+" se resalta al pasar el cursor por el filtro */
+    section[data-testid="stSidebar"] [data-baseweb="select"]:hover div:has(> svg[title="open"])::after {
+        background: #1D4ED8;
+        transform: scale(1.10);
+    }
     </style>
 """, unsafe_allow_html=True)
 

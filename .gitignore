@@ -27,3 +27,6 @@ Thumbs.db
 
 # Activos descargados en runtime
 src/logo_utp.png
+
+# Salida temporal de Streamlit
+*.out
