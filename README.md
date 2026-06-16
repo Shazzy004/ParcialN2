@@ -93,7 +93,18 @@ cd analisis-mercado-laboral-it-panama
   pip install -r requirements.txt
   ```
 
-### Paso 3: Lanzar el Dashboard de Streamlit
+### Paso 3 (opcional): Configurar la API Key de Gemini
+La extracción de habilidades/salarios y las "Conclusiones con IA" usan **Google Gemini**. Es **opcional**: sin clave, el proyecto funciona con un parser heurístico local. Para activarla:
+
+1. Obtén una API key gratis en https://aistudio.google.com/app/apikey
+2. Copia la plantilla y pega tu clave (el archivo `.env` ya viene listo en el repo local; solo edítalo):
+   ```cmd
+   copy .env.example .env      :: si no existe; en Windows CMD
+   ```
+   Abre `.env` y reemplaza `PEGA_TU_KEY_AQUI` por tu clave real.
+3. El archivo `.env` **no se sube a GitHub** (está en `.gitignore`), así que tu clave queda privada.
+
+### Paso 4: Lanzar el Dashboard de Streamlit
 Ejecuta el servidor web local:
 ```bash
 streamlit run src/app.py

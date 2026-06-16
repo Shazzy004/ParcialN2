@@ -18,6 +18,12 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde el archivo .env (si existe) para que la
+# función de "Conclusiones con IA" pueda leer GEMINI_API_KEY. Sin esto, la key
+# del .env no estaría disponible en el dashboard (solo en el pipeline).
+load_dotenv()
 
 # Configurar el diseño de la página de Streamlit de forma premium
 st.set_page_config(
@@ -652,9 +658,13 @@ with tab_ia:
     
     # Botón para generar conclusiones dinámicas
     generar_ia = st.button("✨ Generar/Actualizar Informe del Mercado con IA")
-    
+
+    # Vacío o el placeholder de la plantilla .env se tratan como "sin key"
+    # (el informe cae al generador heurístico en vez de fallar contra la API).
     gemini_key = os.getenv("GEMINI_API_KEY")
-    
+    if gemini_key in (None, "", "PEGA_TU_KEY_AQUI"):
+        gemini_key = None
+
     if generar_ia:
         with st.spinner("Conectando con el LLM para redactar el informe técnico..."):
             if gemini_key:

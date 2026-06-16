@@ -289,8 +289,12 @@ def extract_info_with_gemini(titulo: str, descripcion: str) -> VacanteProcesada:
     Usa la API de Google Gemini para estructurar la vacante a través de un esquema JSON.
     Si la API Key no está configurada, utiliza un parser heurístico (Fallback) con expresiones regulares.
     """
+    # Tratamos como "sin key" tanto el vacío como el placeholder de la plantilla .env,
+    # para no disparar llamadas a la API que fallarían y solo gastarían tiempo.
     gemini_key = os.getenv("GEMINI_API_KEY")
-    
+    if gemini_key in (None, "", "PEGA_TU_KEY_AQUI"):
+        gemini_key = None
+
     if gemini_key:
         try:
             import google.generativeai as genai
