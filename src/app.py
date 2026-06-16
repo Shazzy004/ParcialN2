@@ -275,27 +275,9 @@ else:
 st.sidebar.title("Filtros del Mercado")
 st.sidebar.markdown("Use los controles inferiores para filtrar las ofertas de empleo e interactuar con los modelos.")
 
-# 1. Búsqueda de Texto
-search_query = st.sidebar.text_input("Buscar puesto (Ej: React, Backend)", "")
-
-# 2. Filtro por Categorías
+# --- Opciones disponibles (se calculan antes para inicializar el estado) ---
 categorias_disponibles = sorted(df_jobs["categoria_rol"].unique().tolist())
-selected_categories = st.sidebar.multiselect(
-    "Categorías de Rol",
-    options=categorias_disponibles,
-    default=categorias_disponibles
-)
-
-# 3. Filtro por Portales de Empleo
 portales_disponibles = sorted(df_jobs["portal"].unique().tolist())
-selected_portals = st.sidebar.multiselect(
-    "Portales de Origen",
-    options=portales_disponibles,
-    default=portales_disponibles
-)
-
-# 4. Filtro por Habilidades Técnicas
-# Obtener todas las habilidades únicas
 all_skills = set()
 for s_list in df_jobs["habilidades"].dropna().str.split(","):
     for s in s_list:
@@ -303,32 +285,79 @@ for s_list in df_jobs["habilidades"].dropna().str.split(","):
             all_skills.add(s.strip())
 skills_disponibles = sorted(list(all_skills))
 
+# Valores por defecto de cada filtro. Centralizarlos permite (a) inicializar el
+# estado de los widgets y (b) implementar un botón "Restablecer" en un solo lugar.
+FILTER_DEFAULTS = {
+    "f_search": "",
+    "f_cats": categorias_disponibles,
+    "f_portals": portales_disponibles,
+    "f_skills": [],
+    "f_salario": (1000.0, 4500.0),
+    "f_exp": (0, 6),
+}
+for _k, _v in FILTER_DEFAULTS.items():
+    st.session_state.setdefault(_k, _v)
+
+
+# Los callbacks se ejecutan ANTES de que los widgets se re-instancien en el
+# siguiente rerun, por eso es seguro modificar st.session_state aquí (de lo
+# contrario Streamlit lanzaría un error de "widget ya instanciado").
+def _reset_filtros():
+    for k, v in FILTER_DEFAULTS.items():
+        st.session_state[k] = v
+
+st.sidebar.button("🔄 Restablecer todos los filtros",
+                  on_click=_reset_filtros, use_container_width=True,
+                  help="Vuelve todos los filtros a su valor inicial.")
+
+# 1. Búsqueda de Texto
+search_query = st.sidebar.text_input(
+    "🔎 Buscar puesto (Ej: React, Backend)", key="f_search",
+    help="Filtra por nombre del puesto o título original.")
+
+# 2. Filtro por Categorías + atajos Todas / Ninguna
+st.sidebar.markdown("**🏷️ Categorías de Rol**")
+_cc1, _cc2 = st.sidebar.columns(2)
+_cc1.button("Todas", key="btn_cats_all", use_container_width=True,
+            on_click=lambda: st.session_state.update(f_cats=categorias_disponibles))
+_cc2.button("Ninguna", key="btn_cats_none", use_container_width=True,
+            on_click=lambda: st.session_state.update(f_cats=[]))
+selected_categories = st.sidebar.multiselect(
+    "Categorías de Rol", options=categorias_disponibles,
+    key="f_cats", label_visibility="collapsed",
+    placeholder="Elige una o más categorías")
+
+# 3. Filtro por Portales de Empleo + atajos Todos / Ninguno
+st.sidebar.markdown("**🌐 Portales de Origen**")
+_pp1, _pp2 = st.sidebar.columns(2)
+_pp1.button("Todos", key="btn_portals_all", use_container_width=True,
+            on_click=lambda: st.session_state.update(f_portals=portales_disponibles))
+_pp2.button("Ninguno", key="btn_portals_none", use_container_width=True,
+            on_click=lambda: st.session_state.update(f_portals=[]))
+selected_portals = st.sidebar.multiselect(
+    "Portales de Origen", options=portales_disponibles,
+    key="f_portals", label_visibility="collapsed",
+    placeholder="Elige uno o más portales")
+
+# 4. Filtro por Habilidades Técnicas + atajo Limpiar
+st.sidebar.markdown("**🧰 Habilidades Técnicas**")
+st.sidebar.button("Limpiar habilidades", key="btn_skills_clear", use_container_width=True,
+                  on_click=lambda: st.session_state.update(f_skills=[]))
 selected_skills = st.sidebar.multiselect(
-    "Habilidades Técnicas Requeridas",
-    options=skills_disponibles,
-    default=[]
-)
+    "Habilidades Técnicas Requeridas", options=skills_disponibles,
+    key="f_skills", label_visibility="collapsed",
+    placeholder="Vacío = todas las habilidades")
 
 # 5. Filtro de Salario Máximo y Mínimo
-min_sal = float(df_jobs["salario_min"].min())
-max_sal = float(df_jobs["salario_max"].max())
-
 salario_range = st.sidebar.slider(
-    "Rango Salarial Mensual (USD $)",
-    min_value=500.0,
-    max_value=6000.0,
-    value=(1000.0, 4500.0),
-    step=100.0
-)
+    "💵 Rango Salarial Mensual (USD $)",
+    min_value=500.0, max_value=6000.0, step=100.0, key="f_salario",
+    help="Muestra ofertas cuyo rango salarial se solape con el seleccionado.")
 
 # 6. Años de Experiencia Requeridos
-experiencia_max = int(df_jobs["experiencia_anios"].max())
 selected_exp = st.sidebar.slider(
-    "Años de Experiencia Requerida",
-    min_value=0,
-    max_value=10,
-    value=(0, 6)
-)
+    "📅 Años de Experiencia Requerida",
+    min_value=0, max_value=10, key="f_exp")
 
 
 # 7. Información de los Integrantes del Grupo 4
