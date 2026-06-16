@@ -162,10 +162,13 @@ st.markdown("""
         white-space: normal !important;
     }
     
-    /* Tarjetas de Clusters Adaptables a Modo Oscuro/Claro */
+    /* Tarjetas de Clusters: fondo claro fijo + texto NEGRO siempre, para
+       garantizar legibilidad independientemente del tema (claro/oscuro) del
+       sistema o de Streamlit. Se usa !important para ganarle a las variables
+       de tema y a la media query de modo oscuro del navegador. */
     .cluster-card {
-        background-color: var(--secondary-background-color, #F3F4F6);
-        color: var(--text-color, #1F2937);
+        background-color: #F3F4F6 !important;
+        color: #111827 !important;
         border-radius: 8px;
         padding: 1rem;
         border-top: 4px solid #10B981;
@@ -175,13 +178,13 @@ st.markdown("""
     }
     .cluster-card h4 {
         margin: 0;
-        color: var(--text-color, #1F2937);
+        color: #111827 !important;
     }
     .cluster-card p, .cluster-card b {
         margin: 5px 0;
         font-size: 0.9rem;
-        color: var(--text-color, #4B5563);
-        opacity: 0.95;
+        color: #1F2937 !important;
+        opacity: 1;
     }
     
     /* Ajustes específicos de tema oscuro usando media query del sistema */
@@ -195,9 +198,6 @@ st.markdown("""
         }
         .insight-box div, .insight-box p, .insight-box li, .insight-box span, .insight-box b {
             color: #f1f5f9 !important;
-        }
-        .cluster-card p, .cluster-card b {
-            color: #e2e8f0 !important;
         }
     }
     </style>
